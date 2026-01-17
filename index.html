@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nada é por acaso</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Open+Sans&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    margin: 0;
+    background: #0d0f0e;
+    color: #e0e0e0;
+    font-family: 'Open Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  canvas {
+    display: block;
+    touch-action: manipulation;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    color: #a5d6a7;
+    font-weight: normal;
+    margin-top: 12px;
+  }
+
+  p {
+    max-width: 420px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #cfcfcf;
+    margin: 6px 20px;
+  }
+
+  .versiculo {
+    font-style: italic;
+    color: #8bc34a;
+    margin-top: 8px;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="heart"></canvas>
+
+<h1>Nada é por acaso🌿</h1>
+
+<p>
+Gosto do seu jeito simples e da forma como você se conecta com a natureza.
+Achei bonito isso e fiquei com vontade de te conhecer melhor.
+</p>
+
+<div class="versiculo">
+“Tudo tem o seu tempo determinado.”<br>
+</div>
+
+<script>
+const canvas = document.getElementById("heart");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight * 0.55;
+}
+resize();
+window.addEventListener("resize", resize);
+
+let particles = [];
+const total = 650;
+let time = 0;
+let speed = 0.02;
+let scaleBase = 10;
+let targetScale = 10;
+
+function heart(t) {
+  return {
+    x: 16 * Math.pow(Math.sin(t), 3),
+    y: -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))
+  };
+}
+
+class Particle {
+  constructor(t) {
+    this.t = t;
+    this.offset = Math.random() * Math.PI * 2;
+    this.size = Math.random() * 1.6 + 0.6;
+  }
+
+  update() {
+    const pulse = Math.sin(time + this.offset) * 0.8;
+    const scale = scaleBase + pulse;
+
+    const pos = heart(this.t);
+    this.x = canvas.width / 2 + pos.x * scale;
+    this.y = canvas.height / 2 + pos.y * scale;
+  }
+
+  draw() {
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(255, 170, 190, 0.7)";
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function init() {
+  particles = [];
+  for (let i = 0; i < total; i++) {
+    particles.push(new Particle(Math.random() * Math.PI * 2));
+  }
+}
+init();
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  time += speed;
+
+  scaleBase += (targetScale - scaleBase) * 0.05;
+
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+
+  requestAnimationFrame(animate);
+}
+animate();
+
+canvas.addEventListener("mousedown", () => targetScale = 12);
+canvas.addEventListener("mouseup", () => targetScale = 10);
+canvas.addEventListener("mouseleave", () => targetScale = 10);
+
+canvas.addEventListener("touchstart", () => targetScale = 12);
+canvas.addEventListener("touchend", () => targetScale = 10);
+</script>
+
+</body>
+</html>
